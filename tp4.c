@@ -20,7 +20,8 @@ typedef struct Nodo
 Nodo *crearListaVacia();
 void esListaVacia(Nodo *Lista);
 Nodo *crearNuevoNodo(Tarea pendiente, int ID, char *Buff);
-void cargarNodoEnLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff);
+// void cargarNodoComienzoLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff);
+void cargarNodoFinLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff);
 int seguirCargando(char pregunta);
 void cargarDatosDeUsuario(Nodo **Lista, Tarea pendiente);
 void mostrarLista(Nodo *Lista);
@@ -32,7 +33,7 @@ int main()
     // DEFINICION DE VARIABLES
     Nodo *tareasPendientes = crearListaVacia(); // Creo una lista de tareas pendientes vacia
     Tarea pendiente;
-    esListaVacia(tareasPendientes); // Verifico que la lista se creo correctamente
+    esListaVacia(tareasPendientes);                       // Verifico que la lista se creo correctamente
     cargarDatosDeUsuario(&(tareasPendientes), pendiente); // Carga todas las tareas que quiera el usuario
     mostrarLista(tareasPendientes);
 
@@ -72,11 +73,31 @@ Nodo *crearNuevoNodo(Tarea pendiente, int ID, char *Buff)
     return nuevo;
 }
 
-void cargarNodoEnLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff)
+// void cargarNodoComienzoLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff)
+// {
+//     Nodo *nuevo = crearNuevoNodo(pendiente, ID, Buff);
+//     nuevo->Siguiente = *Lista;
+//     *Lista = nuevo;
+// }
+
+void cargarNodoFinLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff)
 {
     Nodo *nuevo = crearNuevoNodo(pendiente, ID, Buff);
-    nuevo->Siguiente = *Lista;   
-    *Lista = nuevo;
+    if (*Lista == NULL)
+    {
+        *Lista = nuevo;
+    }
+    else
+    {
+        Nodo *aux = *Lista;
+
+        while (aux->Siguiente)
+        {
+            aux = aux->Siguiente;
+        }
+
+        aux->Siguiente = nuevo;
+    }
 }
 
 int seguirCargando(char pregunta)
@@ -105,7 +126,8 @@ void cargarDatosDeUsuario(Nodo **Lista, Tarea pendiente)
         printf("\tTarea a realizar : ");
         gets(Buff); // Cargado descripcion por consola
 
-        cargarNodoEnLista((Lista), pendiente, ID, Buff);
+        // cargarNodoComienzoLista((Lista), pendiente, ID, Buff);
+        cargarNodoFinLista((Lista), pendiente, ID, Buff);
 
         printf("¿Quiere cargar otra tarea a la lista?\n\t\tIngrese S para si o N para no: ");
         scanf("%c", &pregunta);
@@ -128,7 +150,7 @@ void mostrarLista(Nodo *Lista)
 
     while (!(Lista == NULL))
     {
-        printf("Tarea %d:\n", ((Lista->T.TareaID)-999));
+        printf("Tarea %d:\n", ((Lista->T.TareaID) - 999));
         printf("\tPendiente:");
         puts(Lista->T.Descripcion);
         printf("\n");
