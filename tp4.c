@@ -24,7 +24,8 @@ Nodo *crearNuevoNodo(Tarea pendiente, int ID, char *Buff);
 void cargarNodoFinLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff);
 int seguirCargando(char pregunta);
 void cargarDatosDeUsuario(Nodo **Lista, Tarea pendiente);
-void mostrarLista(Nodo *Lista);
+void mostrarListaPendientes(Nodo *Lista);
+
 
 int main()
 {
@@ -32,10 +33,11 @@ int main()
 
     // DEFINICION DE VARIABLES
     Nodo *tareasPendientes = crearListaVacia(); // Creo una lista de tareas pendientes vacia
+    Nodo *tareasRealizadas = crearListaVacia(); // Creo una lista de tareas cumplidas
     Tarea pendiente;
-    esListaVacia(tareasPendientes);                       // Verifico que la lista se creo correctamente
-    cargarDatosDeUsuario(&(tareasPendientes), pendiente); // Carga todas las tareas que quiera el usuario
-    mostrarLista(tareasPendientes);
+    esListaVacia(tareasPendientes); // Verifico que la lista se creo correctamente
+    cargarDatosDeUsuario(&tareasPendientes, pendiente); // Carga todas las tareas que quiera el usuario
+    mostrarListaPendientes(tareasPendientes);   // Muestra la lista de tareas pendientes
 
     return 0;
 }
@@ -126,8 +128,8 @@ void cargarDatosDeUsuario(Nodo **Lista, Tarea pendiente)
         printf("\tTarea a realizar : ");
         gets(Buff); // Cargado descripcion por consola
 
-        // cargarNodoComienzoLista((Lista), pendiente, ID, Buff);
-        cargarNodoFinLista((Lista), pendiente, ID, Buff);
+        // cargarNodoComienzoLista(Lista, pendiente, ID, Buff);
+        cargarNodoFinLista(Lista, pendiente, ID, Buff);
 
         printf("¿Quiere cargar otra tarea a la lista?\n\t\tIngrese S para si o N para no: ");
         scanf("%c", &pregunta);
@@ -142,23 +144,21 @@ void cargarDatosDeUsuario(Nodo **Lista, Tarea pendiente)
     free(Buff);
 }
 
-void mostrarLista(Nodo *Lista)
+void mostrarListaPendientes(Nodo *Lista)
 {
-
-    Nodo *Aux;
+    Nodo *mostrar;
+    Nodo *Aux = Lista;
     printf("Lista de pendientes:\n\n");
 
-    while (!(Lista == NULL))
+    while (!(Aux == NULL))
     {
-        printf("Tarea %d:\n", ((Lista->T.TareaID) - 999));
+        printf("Tarea %d:\n", ((Aux->T.TareaID) - 999));
         printf("\tPendiente:");
-        puts(Lista->T.Descripcion);
+        puts(Aux->T.Descripcion);
         printf("\n");
-        printf("\tDuracion: %d\n", Lista->T.Duracion);
+        printf("\tDuracion: %d\n", Aux->T.Duracion);
 
-        Aux = Lista;
-        Lista = Lista->Siguiente;
-
-        free(Aux);
+        mostrar = Aux;
+        Aux = Aux->Siguiente;
     }
 }
