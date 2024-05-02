@@ -25,7 +25,12 @@ void cargarNodoFinLista(Nodo **Lista, Tarea pendiente, int ID, char *Buff);
 int seguirCargando(char pregunta);
 void cargarDatosDeUsuario(Nodo **Lista, Tarea pendiente);
 void mostrarListaPendientes(Nodo *Lista);
-
+void mostrarListaRealizadas(Nodo *Lista);
+void pregunta(int okey);
+void quitarNodoLista(Nodo **ListaP, int ID);
+void cambiarLista(Nodo **ListaP, Nodo **ListaR, int ID);
+void preguntarCambio(Nodo **ListaP, Nodo **ListaR);
+void liberarMemorias(Nodo *ListaP, Nodo *ListaR);
 
 int main()
 {
@@ -35,9 +40,13 @@ int main()
     Nodo *tareasPendientes = crearListaVacia(); // Creo una lista de tareas pendientes vacia
     Nodo *tareasRealizadas = crearListaVacia(); // Creo una lista de tareas cumplidas
     Tarea pendiente;
-    esListaVacia(tareasPendientes); // Verifico que la lista se creo correctamente
-    cargarDatosDeUsuario(&tareasPendientes, pendiente); // Carga todas las tareas que quiera el usuario
-    mostrarListaPendientes(tareasPendientes);   // Muestra la lista de tareas pendientes
+    esListaVacia(tareasPendientes);                        // Verifico que la lista se creo correctamente
+    cargarDatosDeUsuario(&tareasPendientes, pendiente);    // Carga todas las tareas que quiera el usuario
+    mostrarListaPendientes(tareasPendientes);              // Muestra la lista de tareas pendientes
+    preguntarCambio(&tareasPendientes, &tareasRealizadas); // Cambio entre lista de tareas pendientes y tareas realizadas
+    mostrarListaRealizadas(tareasRealizadas);
+
+    liberarMemorias(tareasPendientes, tareasRealizadas);    //Liberacion de las memorias de los nodos cargados en las listas
 
     return 0;
 }
@@ -160,5 +169,136 @@ void mostrarListaPendientes(Nodo *Lista)
 
         mostrar = Aux;
         Aux = Aux->Siguiente;
+    }
+}
+
+void mostrarListaRealizadas(Nodo *Lista)
+{
+    if (Lista == NULL)
+    {
+        printf("Aun no realizo ninguna tarea");
+    }
+    else
+    {
+        mostrarListaPendientes(Lista);
+    }
+}
+
+void pregunta(int okey)
+{
+    if (okey == 1)
+    {
+        printf("La tarea ingresada no existe");
+    }
+    else
+    {
+        if (okey == 2)
+        {
+            printf("Tarea realizada");
+        }
+    }
+}
+
+void quitarNodoLista(Nodo **ListaP, int ID)
+{
+    Nodo **aux = ListaP;
+    int salir = 0;
+    while (salir == 0)
+    {
+        if (ID == (((*aux)->T.TareaID) - 999))
+        {
+            *aux = (*aux)->Siguiente;
+            salir = 1;
+        }
+        else
+        {
+            aux = &(*aux)->Siguiente;
+        }
+    }
+}
+
+void cambiarLista(Nodo **ListaP, Nodo **ListaR, int ID)
+{
+    Nodo *aux;
+    aux = *ListaP;
+
+    int okey = 0;
+    /*
+    okey = 0, no hay tareas
+    okey = 1, tarea no encontrada
+    okey = 2, tarea encontrada
+    */
+
+    if (aux == NULL)
+    {
+        printf("No hay tareas pendientes");
+    }
+    else
+    {
+        while (aux->Siguiente)
+        {
+            if (ID == ((aux->T.TareaID) - 999))
+            {
+                cargarNodoFinLista(ListaR, aux->T, ID, aux->T.Descripcion);
+                quitarNodoLista(ListaP, ID);
+                okey = 2;
+            }
+            else
+            {
+                okey = 1;
+            }
+        }
+    }
+
+    pregunta(okey);
+}
+
+void preguntarCambio(Nodo **ListaP, Nodo **ListaR)
+{
+    int cambiar = -1;
+    char salir;
+
+    while (cambiar != 0)
+    {
+        printf("\n\nIngrese el numero de la tarea realizada o inserte 0: \n");
+
+        scanf("%d", &cambiar);
+        fflush(stdin);
+
+        cambiarLista(ListaP, ListaR, cambiar);
+
+        printf("Para continuar marcando tareas realizadas ingrese S sino ingrese N: ");
+
+        scanf("%c", &salir);
+
+        if ((salir == 's') || (salir == 'S'))
+        {
+            cambiar = -1;
+        }
+        else
+        {
+            cambiar = 0;
+        }
+    }
+}
+
+void liberarMemorias(Nodo *ListaP, Nodo *ListaR)
+{
+    Nodo *aux;
+
+    while (ListaP)
+    {
+        aux = ListaP;
+        ListaP = ListaP->Siguiente;
+
+        free(aux);
+    }
+
+    while (ListaR)
+    {
+        aux = ListaR;
+        ListaR = ListaR->Siguiente;
+
+        free(aux);
     }
 }
